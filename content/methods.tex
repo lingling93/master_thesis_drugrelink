@@ -1,0 +1,48 @@
+\chapter{Materials and Methods}
+\label{methods}
+
+This thesis starts with reproducing Rephetio since the data set used in this thesis is from Rephetio project and a solid comparison between engineered features in Rephetio and learned features can only be achieved when Rephetio is fully understood. Then, the parameters of node2vec and edge2vec were optimized to generate the best performing model for comparison and novel drug-disease predictions. A Python package was built for reproducibility of this work. The network Hetionet applied in this thesis is downloaded from GitHub repositories.
+
+\section{Reproduction of Rephetio}
+
+Himmelstein et al. ~\cite{himmelstein_systematic_2017} generated a biological knowledge graph with more than 47k nodes and 2000k edges. It includes genes, diseases, compounds, biological processes and so on. The edges are annotated as increase, decrease, target and so on. Himmelstein uses metapath to analyze the graph, create a metric named DWPC, to represent the prevalence of each metapath. With engineered features, to train logistic regression model with known indication ~\cite{himmelstein_heterogeneous_2015}.
+
+Daniel Himmelstein et al. released all data and note books about his work. The ‘integrate’ repository is to integrate all database and curation to graph, also generate 5 permutation graphs. The ‘learn’ repository is to prepare features and evaluate them, then train and validate the logistic regression model. During the process of reproducing, the most difficulties are come from two parts, environment and the size of the graph is too big. Because he released notebooks, not a python package, even though he gives a configuration file, still many errors come out due to environmental problems. The environmental problem could be solved by changing the version of a package or upgrade something in python.
+
+Due to the size of Hetionet, parsing the whole graph for testing functions is unrealistic. But with a random graph, it is meaningless to analyze it. A meaningful subgraph needs to be generated from Hetionet. With drug-disease pairs and their labels, n pairs of positive samples and m negative samples are randomly chosen. Then all simple paths are extracted between them with a cutoff 3, which means the length of paths. In such a way, the drug-disease paris are kept and metapaths are kept too. With those characteristics, this subgraph is qualified to represent the Hetionet
+
+\section{Optimize Parameters of node2vec} \label{op_node2vec}
+
+Parameters were greedily optimized in the following order, from dimensions to q according to the paper of node2vec and Palumbo’s work ~\cite{gangemi_knowledge_2018}:
+
+\textbf{dimensions}: Dimensions of feature vectors, a parameter from word2vec model, represents the dimensions of word (node) vectors. The most common empirical for word2vec model is 100, also 100 is the default value of word2vec python library. The bigger the dimension is, the more information it contains, easier to overfit for the model. For data in this thesis, less dimensions are better for prediction. 16, 32, 48, 64, 159 are tried to generate node embeddings.
+
+\textbf{walk$\_$length}: Walk$\_$length gives the number of nodes for one walk to go through. It is the length of the ‘sentence’ parsed into skip-gram model. Node2vec is sensitive to walk length. [89] 30, 50, 100 are tried in this thesis.
+
+\textbf{window size}: Window size is a parameter from word2vec model, illustrate the distance between words which affect each other in the model [91]. For example, in the sentence “Lingling is doing her master thesis in fraunhofer scai”, when the window size is three, the word ‘her’ would be affected by words ‘Lingling’, ‘is’, ‘doing’ on the left and words ‘master’, ‘thesis’, ‘in’ on the right. 2, 3, 4, 10 are tried in this thesis.
+
+\textbf{number$\_$walk}: Number$\_$walk is the number of walks started from every node in the graph. Also the times of random walk to iterate the graph. Node2vec is sensitive to number$\_$walk too [89], [100]. Bigger the number$\_$walk is, more different walks would be generated from the graph, better representative the skip-gram model should be. 10, 20, 30 are tried in this thesis.
+
+\textbf{\emph{p}}: Return parameter, controls the possibility for a walk to visit the previous node. (more description in method), if set \textit{p} a high value (greater than max (\textit{q}, 1)), it is less likely to visit the previous node. The random walk is encouraged to explore further nodes from the visited nodes. If set p a low value (smaller than min (\textit{q}, 1)), it is more likely to visit the previous node and the walk is more likely to explore the ‘local’ area around the starting node. 1.0, 2.0, and 0.5 are tried in this thesis.
+
+\textbf{\emph{q}}: In-out parameter, controls the walk to go to ‘inward’ node or ‘outward’ node. If \textit{q} > 1, the walk is biased towards nodes closer to the previous visited node. If \textit{q} < 1, the walk is more likely to go to further node of the previously visited node. 1.0, 2.0, and 0.5 are tried in this thesis.
+
+\section{Optimize Parameters of Edge2vec}\label{op_edge2vec}
+
+The edge2vec ~\cite{gao_edge2vec:_2018} algorithm is based on Node2vec ~\cite{grover_node2vec:_2016}. It uses EM to exploit the correlation level between different edge types in order to capture edge semantics information for biological heterogeneous network. The EM would make transition probability matrix converge after a certain time of updating. It is unknown how many times it would take for getting a converged transition probability matrix. The number of all edges are above 2 million with 24 types. According to the algorithm of edge2vec, it calculates the frequency of every edge types in every walk. So 100 is a reasonable number for one walk to cover all edge types theoretically. Also 100 is a good choice from node2vec to make results more stable. 10,000 gives 10,000 pairs of data to calculate the correlation between two edge types. In consideration of time consuming problem, 10,000 is a suitable number to try. The edge2vec hyperparameters were optimized greedily in the order below:
+
+\textbf{em\_iteration}: A number to control how many times for \ac{EM} to update \ac{TPM}, is important for the quality of embeddings. Bigger the number is, closer for Transition Probability to converge, more time to run. 5, 10 are tried in this thesis.
+
+\textbf{max\_count}: A number to control how many edges to sample for one epoch in EM, is very significant for the quality of \ac{TPM}. Larger the number is, more edges sampled, the more accurate the transition probability is. 1,000 and 10,000 are tried in this thesis.
+
+\textbf{e\_step}: A parameter to choose which test function to be used for evaluate the correlation level of two edge types. 4 test functions are tried in this thesis. More details in Table \ref{tab:tests in edge2vec}.
+
+\section{Positive Unlabeled Learning}
+
+The way in which Himmelstein \textit{et al.} ~\cite{himmelstein_systematic_2017} trained logistic regression model is suitable for proving that engineered features (e.g., \ac{DWPC}) can represent Hetionet well with an optimistic \ac{AUC-ROC} value. In this thesis, the goal is to get a prediction model. With a heavily imbalanced training dataset (drug-disease pairs with edges : drug-disease pairs with no edges = 1 : 30), the logistic regression model would not perform well for prediction. The training set was created in the way that positive samples are drug-disease pairs with indication relationships (have an edge between the drug and disease), negative samples are pairs with unknow relationships (have no edge between the drug and the disease). This strategy would cause a problem that some drug-disease pairs are in training data set, then the prediction is inaccurate.
+
+To solve this \ac{PU} learning problem, the negative samples are generated by sampling the unlabeled drug-disease pairs with the size equal to that of positive samples when the pairs needed to be predicted are out of the unlabeled data set. Also a golden data set repoDB ~\cite{shameer_systematic_2018} for drug repositioning can be used for training and evaluation.
+
+\section{Reproducibility Statement}
+
+Building a python package makes this work reproducible. Everything is wrapped in package to work automatically after running it through command line. Because data used in this thesis is released by other scientists, so download.py is written to download data from GitHub repositories. The values of parameters are parsed through a configuration file, because the number of parameters is beyond 10, if parsing them through command line interface, it would be confusing and inconvenient. Also, the configuration file is stored in the output directory, which is easier for operating statistics and analysis about them. The package for this thesis is available in GitHub.

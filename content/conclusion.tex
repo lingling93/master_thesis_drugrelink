@@ -1,0 +1,27 @@
+\chapter{Conclusion and Future Work}\label{conclusion}
+\section{Reflections}
+
+This thesis truly benefited from open resource data. Hetionet is open resource on GitHub, all the original data and the pre-processing are available, organized and easy to get access to. Also, reading all thinklab notes about Rephetio project, gives me a teaching that how other scientists think and work, which is very inspiring and makes his work more convincing and reliable. Besides, it is also easier to understand and evaluate the work with all data and codes. Edge2vec python package is released in GitHub, but the codes were unorganized and gave errors when running with Hetionet. Modifying edge2vec package and implementing multiprocessing method into it consumed almost one month in this thesis. Even open-resource data is common in recent years, quality of the data is the further issue to be addressed.
+
+The logistic regression model is powerful to differentiate classes. Other classification methods can be implemented too such as support vector machine. And with embeddings, not only drug-disease pairs could be classified, drug-target, target-disease and many other models could be built, which haven’t been completed in this thesis due to time limitations. 
+
+
+\section{Limitations}
+
+Hetionet was released 3 years ago. Some compounds are not in the network and diseases are limited to 136 kinds of diseases, way smaller than disease types in the real world. If more information contained in Hetionet, such as phosphorylation and degradation, the network would be more informative and the models would perform better. 
+
+Then another problem comes after having a large network, which is to improve the efficiency and reduce training time. Even with the Hetionet, it was a problem for optimizing parameters with 200k edges. When running a experiment takes 2-4 hours and it was necessary to repeat experiments for reduce the confusion of randomness, optimizing one set of parameters took for almost one day, which limited the options of parameters. Therefore, a more efficient algorithm is in highly demanding.
+
+Another serious limitation is that node2vec and edge2vec basically catch structure information of the network. Node2vec only catch topological structures and treat a heterogeneous network as homogeneous, at last, lots of semantic information is lost. For edge2vec, the correlation information between edge types is considered, but semantic information of nodes are abandoned too.
+
+For training a binary classification model, positive samples are important. Negative samples are significant to the quality of models too. But in the real world, there is not much reliable source for negative samples of drug-disease relationships, which means the drug can’t treat the disease. In such a situation, negative samples are randomly chosen from unlabeled drug-disease pairs.
+
+
+\section{Future Work}
+
+The models built in this thesis perform well in predicting new drug-disease edges. But there are some space for improvement. The first one is to update the network with new data and enrich the network with more specific biological information such as phosphorylation, degradation and quantitative assay data (e.g., IC50). The quantitative data can be used as weights for edges in the network to further constrain random walk. Then the following issue is to normalize the quantitative assay data.
+
+The second one is to improve the computational speed of algorithms. Because the logistic regression models in this thesis were trained by drug-disease edge vectors, so they can only predict novel drug-disease relationships. But in reality, drug-target, drug-disease predictions are also important for drug repositioning, so the third future work is to build other models for predicting drug-target, target-disease with respective vectors generated from node2vec or edge2vec model.
+
+The third one is to apply repoDB~\cite{shameer_systematic_2018} to train and evaluate classification models. RepoDB contains drugs failed in clinical trials, which can be negative samples to train models to make classification models more realistic. Then the predictions would be more accurate. Also repoDB can be used for evaluate the current logistic models. The evaluation results would be more solid and convincing.
+
