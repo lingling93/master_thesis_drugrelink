@@ -1,6 +1,6 @@
-# Generation and Applications of Side Effect Embeddings in Biomedical Knowledge Discovery [![DOI](https://zenodo.org/badge/208453046.svg)](https://zenodo.org/badge/latestdoi/208453046)
+# A Comparison of Learned and Engineered Features in Network-Based Drug Repositioning
 
-This repository contains the master thesis of Rana Subhi Aldisi. Click [here](https://github.com/AldisiRana/masters_thesis/raw/master/main.pdf) for the latest version.
+This repository contains the master thesis of Lingling Xu. Click [here](https://github.com/lingling93/master_thesis_drugrelink/blob/master/main.pdf) for the latest version.
 
 ## Build
 
@@ -11,10 +11,6 @@ $ latexmk -pdf -pvc main
 ```
 ## Abstract
 
-Side effects are unintended consequences of introducing drugs into the body.
-Identifying a drug candidate's side effects is an important step in drug development that can both be expensive and still result in incomplete side effects profiles.
-Further, side effect profiles have been used to identify drugs' targets and hypothesize new therapeutic benefits for existing drugs.
+Drug repositioning is an time-efficient and less costly way for drug design. Computational methods especially network-based approaches are applied to integrate biological knowledge and then extract feature embeddings from the network for building a binary classification model to differentiate and predict the relationship between a drug and a disease.
 
-This thesis introduces a workflow that applies network representation learning to biomedical networks that contain drugs, their targets, their indications, and their side effects in an attempt to understand the mechanisms of action underlying side effects.
-Different network representation learning models were evaluated and optimized before selecting the best for training a predictive model for relations between different entities in the original network.
-It was then used to predict chemical-phenotype, chemical-target, and target-phenotype relations, which were analyzed and validated using literature.
+This thesis introduces a workflow that leverages network representation learning methods such as node2vec and edge2vec to generate learned features for Hetionet, an integrated heterogeneous network with comparatively rich biological data (47k nodes and 2000k edges). After optimizing the parameters of node2vec and edge2vec, compare the performances of models trained by learned features and engineered features to evaluate the quality of feature embeddings. At the end, well trained models are used to predict new edges between drug nodes and disease nodes. Case study of HDAC-6 inhibitor, vorinostat, is provided. Diseases that can be potentially treated by vorinostat are predicted and some of them are validated by reserches done by other scientists. Another case study is to predict novel drug candidates for \ac{AD}, also, some of the predictions have been reported. In summary, learned features from node2vec and edge2vec can catch structure and semantic characteristics of the network. And high-quality learned feature embeddings can replace engineered features for drug repositioning tasks.
