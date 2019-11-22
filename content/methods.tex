@@ -15,7 +15,7 @@ Due to the size of Hetionet, parsing the whole graph for testing functions is un
 
 Parameters were greedily optimized in the following order, from dimensions to q according to the paper of node2vec and Palumbo’s work ~\cite{gangemi_knowledge_2018}:
 
-\textbf{dimensions}: Dimensions of feature vectors, a parameter from word2vec model, represents the dimensions of word (node) vectors. The most common empirical for word2vec model is 100, also 100 is the default value of word2vec python library. The bigger the dimension is, the more information it contains, easier to overfit for the model. For data in this thesis, less dimensions are better for prediction. 16, 32, 48, 64, 159 are tried to generate node embeddings.
+\textbf{dimensions}: Dimensions of feature vectors, a parameter from word2vec model, represents the dimensions of word (node) vectors. The most common parameter for word2vec model is 100, also 100 is the default value of word2vec python library. The bigger the dimension is, the more information it contains, easier to overfit for the model. For data in this thesis, less dimensions are better for prediction. 16, 32, 48, 64, 159 are tried to generate node embeddings.
 
 \textbf{walk$\_$length}: Walk$\_$length gives the number of nodes for one walk to go through. It is the length of the ‘sentence’ parsed into skip-gram model. Node2vec is sensitive to walk length. [89] 30, 50, 100 are tried in this thesis.
 
